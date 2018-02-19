@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		178C3441203AF1E4003A3D78 /* UIScrollView+Bouncing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 178C3440203AF1E4003A3D78 /* UIScrollView+Bouncing.swift */; };
 		17DD7D14202B653D00EED957 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DD7D13202B653D00EED957 /* AppDelegate.swift */; };
 		17DD7D16202B653D00EED957 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17DD7D15202B653D00EED957 /* MainViewController.swift */; };
 		17DD7D19202B653D00EED957 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 17DD7D17202B653D00EED957 /* Main.storyboard */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		178C3440203AF1E4003A3D78 /* UIScrollView+Bouncing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Bouncing.swift"; sourceTree = "<group>"; };
 		17DD7D10202B653D00EED957 /* StatusBar-Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StatusBar-Sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		17DD7D13202B653D00EED957 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		17DD7D15202B653D00EED957 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -39,6 +41,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		178C343F203AF1C5003A3D78 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				178C3440203AF1E4003A3D78 /* UIScrollView+Bouncing.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		17DD7D07202B653D00EED957 = {
 			isa = PBXGroup;
 			children = (
@@ -58,6 +68,7 @@
 		17DD7D12202B653D00EED957 /* StatusBar-Sample */ = {
 			isa = PBXGroup;
 			children = (
+				178C343F203AF1C5003A3D78 /* Extension */,
 				17DD7D2E202CA96600EED957 /* Assets */,
 				17DD7D2D202CA94D00EED957 /* Application */,
 				17DD7D29202CA91000EED957 /* Frontend */,
@@ -190,6 +201,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				178C3441203AF1E4003A3D78 /* UIScrollView+Bouncing.swift in Sources */,
 				17DD7D28202CA2B800EED957 /* SlideViewController.swift in Sources */,
 				17DD7D16202B653D00EED957 /* MainViewController.swift in Sources */,
 				17DD7D14202B653D00EED957 /* AppDelegate.swift in Sources */,

@@ -9,6 +9,12 @@
 import Foundation
 import UIKit
 
+enum ScrollDirection {
+    case none
+    case up
+    case down
+}
+
 final class SlideViewController: UIViewController {
     private var isHiddenStatusBar: Bool = false {
         didSet {
@@ -22,7 +28,19 @@ final class SlideViewController: UIViewController {
             navigationController.setNavigationBarHidden(isHiddenStatusBar, animated: true)
         }
     }
-    private var lastContentOffset: CGFloat = 0
+    private var lastContentOffset: CGPoint = .zero
+    private var scrollDirection: ScrollDirection = .none {
+        didSet {
+            switch scrollDirection {
+            case .up:
+                isHiddenStatusBar = false
+            case .down:
+                isHiddenStatusBar = true
+            default:
+                break
+            }
+        }
+    }
     private static let cellReuseIdentifier = "cell"
     @IBOutlet private weak var tableView: UITableView! {
         didSet {
@@ -51,17 +69,21 @@ final class SlideViewController: UIViewController {
 }
 
 extension SlideViewController: UITableViewDelegate {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        self.lastContentOffset = scrollView.contentOffset
+    }
+    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.lastContentOffset > scrollView.contentOffset.y,
-            self.lastContentOffset < (scrollView.contentSize.height - scrollView.frame.height) {
-            // move up
-            isHiddenStatusBar = false
-        } else if self.lastContentOffset < scrollView.contentOffset.y, scrollView.contentOffset.y > 0 {
-            // move down
-            isHiddenStatusBar = true
+        guard !scrollView.isBouncing else {
+            return
         }
         
-        self.lastContentOffset = scrollView.contentOffset.y
+       
+        if self.lastContentOffset.y > scrollView.contentOffset.y {
+            scrollDirection = .up
+        } else if self.lastContentOffset.y < scrollView.contentOffset.y {
+            scrollDirection = .down
+        }
     }
 }
 
@@ -71,7 +93,7 @@ extension SlideViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 500
+        return 50
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
