@@ -16,21 +16,29 @@ enum ScrollDirection {
 }
 
 final class SlideViewController: UIViewController {
+    private let lock = DispatchSemaphore(value: 1)
     private var isHiddenStatusBar: Bool = false {
         didSet {
-            guard isHiddenStatusBar != oldValue else {
-                return
-            }
+            
             guard let navigationController = navigationController else {
                 return
             }
             
-            navigationController.setNavigationBarHidden(isHiddenStatusBar, animated: true)
+            switch lock.wait(wallTimeout: .now()) {
+            case .success:
+                navigationController.setNavigationBarHidden(hidden: isHiddenStatusBar, animated: true) {
+                    self.lock.signal()
+                }
+            default: break
+            }
         }
     }
     private var lastContentOffset: CGPoint = .zero
     private var scrollDirection: ScrollDirection = .none {
         didSet {
+            guard oldValue != scrollDirection else {
+                return
+            }
             switch scrollDirection {
             case .up:
                 isHiddenStatusBar = false
@@ -69,21 +77,18 @@ final class SlideViewController: UIViewController {
 }
 
 extension SlideViewController: UITableViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.lastContentOffset = scrollView.contentOffset
-    }
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard !scrollView.isBouncing else {
+        guard !scrollView.isBouncing, scrollView.isDragging else {
             return
         }
         
-       
         if self.lastContentOffset.y > scrollView.contentOffset.y {
             scrollDirection = .up
         } else if self.lastContentOffset.y < scrollView.contentOffset.y {
             scrollDirection = .down
         }
+        
+        self.lastContentOffset = scrollView.contentOffset
     }
 }
 

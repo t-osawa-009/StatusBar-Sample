@@ -10,32 +10,41 @@ import Foundation
 import UIKit
 
 final class FadeViewController: UIViewController {
+    private let lock = DispatchSemaphore(value: 1)
     private var isHiddenStatusBar: Bool = false {
         didSet {
-            guard isHiddenStatusBar != oldValue else {
-                return
-            }
+            
             guard let navigationController = navigationController else {
                 return
             }
             
-            if isHiddenStatusBar {
-                UIView.transition(with: navigationController.navigationBar, duration: TimeInterval(UINavigationControllerHideShowBarDuration), options: [.transitionCrossDissolve], animations: {
+            switch lock.wait(wallTimeout: .now()) {
+            case .success:
+                if isHiddenStatusBar {
+                    UIView.transition(with: navigationController.navigationBar, duration: TimeInterval(UINavigationControllerHideShowBarDuration), options: [.transitionCrossDissolve], animations: {
+                        navigationController.navigationBar.isHidden = true
+                    }, completion: { (_) in
+                        navigationController.navigationBar.isHidden = false
+                        navigationController.isNavigationBarHidden = true
+                        self.lock.signal()
+                        UIView.animate(withDuration: TimeInterval(UINavigationControllerHideShowBarDuration)) { [weak self] in
+                            self?.setNeedsStatusBarAppearanceUpdate()
+                        }
+                    })
+                } else {
+                    navigationController.isNavigationBarHidden = false
                     navigationController.navigationBar.isHidden = true
-                }, completion: { (_) in
-                    navigationController.navigationBar.isHidden = false
-                    navigationController.isNavigationBarHidden = true
-                })
-            } else {
-                navigationController.isNavigationBarHidden = false
-                navigationController.navigationBar.isHidden = true
-                UIView.transition(with: navigationController.navigationBar, duration: TimeInterval(UINavigationControllerHideShowBarDuration), options: [.transitionCrossDissolve], animations: {
-                    navigationController.navigationBar.isHidden = false
-                }, completion: nil)
-            }
-            
-            UIView.animate(withDuration: TimeInterval(UINavigationControllerHideShowBarDuration)) { [weak self] in
-                self?.setNeedsStatusBarAppearanceUpdate()
+                    UIView.transition(with: navigationController.navigationBar, duration: TimeInterval(UINavigationControllerHideShowBarDuration), options: [.transitionCrossDissolve], animations: {
+                        navigationController.navigationBar.isHidden = false
+                    }, completion: { (_) in
+                        self.lock.signal()
+                        UIView.animate(withDuration: TimeInterval(UINavigationControllerHideShowBarDuration)) { [weak self] in
+                            self?.setNeedsStatusBarAppearanceUpdate()
+                        }
+                    })
+                }
+                
+            default: break
             }
         }
     }
@@ -80,12 +89,8 @@ final class FadeViewController: UIViewController {
 }
 
 extension FadeViewController: UITableViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        self.lastContentOffset = scrollView.contentOffset
-    }
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard !scrollView.isBouncing else {
+        guard !scrollView.isBouncing, scrollView.isDragging else {
             return
         }
         
@@ -95,6 +100,7 @@ extension FadeViewController: UITableViewDelegate {
             scrollDirection = .down
         }
         
+        self.lastContentOffset = scrollView.contentOffset
     }
 }
 
